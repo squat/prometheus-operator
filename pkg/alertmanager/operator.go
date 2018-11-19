@@ -24,6 +24,7 @@ import (
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	"github.com/coreos/prometheus-operator/pkg/k8sutil"
 	prometheusoperator "github.com/coreos/prometheus-operator/pkg/prometheus"
+	"github.com/go-test/deep"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -371,6 +372,12 @@ func (c *Operator) handleStatefulSetUpdate(oldo, curo interface{}) {
 		return
 	}
 
+	diff := deep.Equal(old, cur)
+	fmt.Println("CHECKING DIFF IN ALERTMANAGER SSET HANDLER")
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	fmt.Println(diff)
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
 	// Wake up Alertmanager resource the deployment belongs to.
 	if a := c.alertmanagerForStatefulSet(cur); a != nil {
 		c.enqueue(a)
@@ -429,6 +436,13 @@ func (c *Operator) sync(key string) error {
 	if err != nil {
 		return errors.Wrap(err, "making the statefulset, to update, failed")
 	}
+
+	diff := deep.Equal(obj.(*appsv1.StatefulSet), sset)
+	fmt.Println("CHECKING DIFF IN ALERTMANAGER SYNC")
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	fmt.Println(diff)
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
 	if _, err := ssetClient.Update(sset); err != nil {
 		return errors.Wrap(err, "updating statefulset failed")
 	}

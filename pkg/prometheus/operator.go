@@ -24,6 +24,7 @@ import (
 	"github.com/coreos/prometheus-operator/pkg/client/monitoring"
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/client/monitoring/v1"
 	"github.com/coreos/prometheus-operator/pkg/k8sutil"
+	"github.com/go-test/deep"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -885,6 +886,12 @@ func (c *Operator) handleStatefulSetUpdate(oldo, curo interface{}) {
 		return
 	}
 
+	diff := deep.Equal(old, cur)
+	fmt.Println("CHECKING DIFF IN PROMETHEUS SSET HANDLER")
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	fmt.Println(diff)
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
 	if ps := c.prometheusForStatefulSet(cur); ps != nil {
 		level.Debug(c.logger).Log("msg", "StatefulSet updated")
 		c.triggerByCounterVec.WithLabelValues("StatefulSet", "update").Inc()
@@ -984,6 +991,13 @@ func (c *Operator) sync(key string) error {
 	}
 
 	level.Debug(c.logger).Log("msg", "updating current Prometheus statefulset")
+
+	diff := deep.Equal(obj.(*appsv1.StatefulSet), sset)
+	fmt.Println("CHECKING DIFF IN PROMETHEUS SYNC")
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+	fmt.Println(diff)
+	fmt.Println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
 	if _, err := ssetClient.Update(sset); err != nil {
 		return errors.Wrap(err, "updating statefulset failed")
 	}
